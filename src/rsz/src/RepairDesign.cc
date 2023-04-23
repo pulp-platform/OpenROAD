@@ -169,7 +169,13 @@ void RepairDesign::repairDesign(
     printProgress(print_iteration, false, false, repaired_net_count);
   }
   int max_length = resizer_->metersToDbu(max_wire_length);
+  int previous_progress = 0;
   for (int i = resizer_->level_drvr_vertices_.size() - 1; i >= 0; i--) {
+    int progress = (int)(100.0F * (1.0F - ((float)i / (float)resizer_->level_drvr_vertices_.size())));
+    if (progress > previous_progress) {
+      logger_->info(RSZ, 1234, "Repaired: {}%", progress);
+      previous_progress = progress;
+    }
     print_iteration++;
     if (verbose) {
       printProgress(print_iteration, false, false, repaired_net_count);
