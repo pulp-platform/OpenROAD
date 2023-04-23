@@ -174,6 +174,7 @@ RepairDesign::repairDesign(double max_wire_length, // zero for none (meters)
     printProgress(print_iteration, false, false, repaired_net_count);
   }
   int max_length = resizer_->metersToDbu(max_wire_length);
+  int previous_progress = 0;
   for (int i = resizer_->level_drvr_vertices_.size() - 1; i >= 0; i--) {
     print_iteration++;
     if (verbose) {
