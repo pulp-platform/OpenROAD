@@ -44,6 +44,10 @@ namespace sta {
 class dbSta;
 }
 
+namespace dpl {
+class Opendp;
+};
+
 namespace grt {
 class GlobalRouter;
 }
@@ -74,6 +78,7 @@ class Replace
   ~Replace();
 
   void init(odb::dbDatabase* odb,
+            dpl::Opendp* dp,
             rsz::Resizer* resizer,
             grt::GlobalRouter* router,
             utl::Logger* logger);
@@ -143,6 +148,7 @@ class Replace
   bool initNesterovPlace();
 
   odb::dbDatabase* db_;
+  dpl::Opendp* dp_;
   rsz::Resizer* rs_;
   grt::GlobalRouter* fr_;
   utl::Logger* log_;

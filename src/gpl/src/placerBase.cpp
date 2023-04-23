@@ -34,6 +34,7 @@
 #include "placerBase.h"
 
 #include <odb/db.h>
+#include <dpl/Opendp.h>
 
 #include <iostream>
 
@@ -514,8 +515,8 @@ void Pin::updateCoordi(odb::dbITerm* iTerm)
     offsetCy_ = (offsetLy + offsetUy) / 2 - instCenterY;
   }
 
-  cx_ = lx + instCenterX + offsetCx_;
-  cy_ = ly + instCenterY + offsetCy_;
+      cx_ = lx + instCenterX + offsetCx_;
+      cy_ = ly + instCenterY + offsetCy_;
 }
 
 //
@@ -793,11 +794,13 @@ PlacerBase::PlacerBase()
 }
 
 PlacerBase::PlacerBase(odb::dbDatabase* db,
+                       dpl::Opendp* dp,
                        PlacerBaseVars pbVars,
                        utl::Logger* log)
     : PlacerBase()
 {
   db_ = db;
+  dp_ = dp;
   log_ = log;
   pbVars_ = pbVars;
   init();
@@ -851,9 +854,18 @@ void PlacerBase::init()
     if (!type.isCore() && !type.isBlock()) {
       continue;
     }
+    // Get Padding from Detailed Placer
+    int padLeft = dp_->padLeft(inst);
+    int padRight = dp_->padRight(inst);
+    if (padLeft == 0) {
+      padLeft = pbVars_.padLeft;
+    }
+    if (padRight == 0) {
+      padRight = pbVars_.padRight;
+    }
     Instance myInst(inst,
-                    pbVars_.padLeft * siteSizeX_,
-                    pbVars_.padRight * siteSizeX_,
+                    padLeft * siteSizeX_,
+                    padRight * siteSizeX_,
                     siteSizeY_,
                     log_);
 
