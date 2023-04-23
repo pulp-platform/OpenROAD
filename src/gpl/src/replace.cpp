@@ -43,6 +43,7 @@
 #include "nesterovBase.h"
 #include "nesterovPlace.h"
 #include "odb/db.h"
+#include "dpl/Opendp.h"
 #include "ord/OpenRoad.hh"
 #include "placerBase.h"
 #include "routeBase.h"
@@ -60,12 +61,14 @@ Replace::Replace() = default;
 Replace::~Replace() = default;
 
 void Replace::init(odb::dbDatabase* odb,
+                   dpl::Opendp* dp,
                    sta::dbSta* sta,
                    rsz::Resizer* resizer,
                    grt::GlobalRouter* router,
                    utl::Logger* logger)
 {
   db_ = odb;
+  dp_ = dp;
   sta_ = sta;
   rs_ = resizer;
   fr_ = router;
@@ -141,7 +144,7 @@ void Replace::doIncrementalPlace(int threads)
     pbVars.padRight = padRight_;
     pbVars.skipIoMode = skipIoMode_;
 
-    pbc_ = std::make_shared<PlacerBaseCommon>(db_, pbVars, log_);
+    pbc_ = std::make_shared<PlacerBaseCommon>(db_, dp_, pbVars, log_);
 
     pbVec_.push_back(std::make_shared<PlacerBase>(db_, pbc_, log_));
 
@@ -219,7 +222,7 @@ void Replace::doInitialPlace()
     pbVars.padRight = padRight_;
     pbVars.skipIoMode = skipIoMode_;
 
-    pbc_ = std::make_shared<PlacerBaseCommon>(db_, pbVars, log_);
+    pbc_ = std::make_shared<PlacerBaseCommon>(db_, dp_, pbVars, log_);
 
     pbVec_.push_back(std::make_shared<PlacerBase>(db_, pbc_, log_));
 
@@ -269,7 +272,7 @@ bool Replace::initNesterovPlace(int threads)
     pbVars.padRight = padRight_;
     pbVars.skipIoMode = skipIoMode_;
 
-    pbc_ = std::make_shared<PlacerBaseCommon>(db_, pbVars, log_);
+    pbc_ = std::make_shared<PlacerBaseCommon>(db_, dp_, pbVars, log_);
 
     pbVec_.push_back(std::make_shared<PlacerBase>(db_, pbc_, log_));
 
