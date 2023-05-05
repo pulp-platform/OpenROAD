@@ -558,19 +558,22 @@ void GlobalRouter::updateDirtyNets(std::vector<Net*>& dirty_nets)
   initRoutingLayers();
   for (odb::dbNet* db_net : dirty_nets_) {
     Net* net = db_net_map_[db_net];
-    // get last pin positions
-    std::vector<odb::Point> last_pos;
-    for (const Pin& pin : net->getPins()) {
-      last_pos.push_back(pin.getOnGridPosition());
-    }
-    net->destroyPins();
-    // update pin positions
-    makeItermPins(net, db_net, grid_->getGridArea());
-    makeBtermPins(net, db_net, grid_->getGridArea());
-    findPins(net);
-    // compare new positions with last positions & add on vector
-    if (checkPinPositions(net, last_pos)) {
-      dirty_nets.push_back(db_net_map_[db_net]);
+    if (net != nullptr) {
+        // get last pin positions
+        std::vector<odb::Point> last_pos;
+        for (const Pin& pin : net->getPins()) {
+          last_pos.push_back(pin.getOnGridPosition());
+        }
+        net->destroyPins();
+        // update pin positions
+        makeItermPins(net, db_net, grid_->getGridArea());
+        makeBtermPins(net, db_net, grid_->getGridArea());
+        findPins(net);
+        // compare new positions with last positions & add on vector
+        if (checkPinPositions(net, last_pos)) {
+          dirty_nets.push_back(db_net_map_[db_net]);
+    } else {
+      logger_->info(GRT, 1234, "Net not found: {}", db_net->getName());
     }
   }
   dirty_nets_.clear();
@@ -2338,9 +2341,17 @@ std::vector<Pin*> GlobalRouter::getAllPorts()
 {
   std::vector<Pin*> ports;
   for (auto [ignored, net] : db_net_map_) {
-    for (Pin& pin : net->getPins()) {
-      if (pin.isPort()) {
-        ports.push_back(&pin);
+    if (net != nullptr) {
+      for (Pin& pin : net->getPins()) {
+        if (pin.isPort()) {
+          ports.push_back(&pin);
+        }
+      }
+    } else {
+      if (ignored == nullptr) {
+        logger_->info(GRT, 4322, "Net and Key in db_net_map is nullptr!");
+      } else {
+        logger_->info(GRT, 4321, "Net {} in db_net_map is nullptr!", ignored->getName());
       }
     }
   }
@@ -3900,7 +3911,6 @@ void GlobalRouter::updateDirtyRoutes(bool save_guides)
 
     if (dirty_nets.empty()) {
       return;
-    }
 
     const float old_critical_nets_percentage = critical_nets_percentage_;
     critical_nets_percentage_ = 0;
