@@ -140,7 +140,13 @@ RepairSetup::repairSetup(float setup_slack_margin,
   // Always repair the worst endpoint, even if tns percent is zero.
   max_end_count = max(max_end_count, 1);
   resizer_->incrementalParasiticsBegin();
+  int previous_progress = -1;
   for (Vertex *end : violating_ends) {
+    int progress = (int)(100.0F * ((float)end_index / (float)max_end_count));
+    if (progress > previous_progress) {
+      logger_->info(RSZ, 1235, "Repaired setup: {}%", progress);
+      previous_progress = progress;
+    }
     resizer_->updateParasitics();
     sta_->findRequireds();
     Slack end_slack = sta_->vertexSlack(end, max_);
