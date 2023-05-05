@@ -157,8 +157,14 @@ RepairSetup::repairSetup(const float setup_slack_margin,
   if (verbose) {
     printProgress(print_iteration, false, false);
   }
+  int previous_progress = -1;
   for (const auto& end_original_slack : violating_ends) {
     Vertex* end = end_original_slack.first;
+    int progress = (int)(100.0F * ((float)end_index / (float)max_end_count));
+    if (progress > previous_progress) {
+      logger_->info(RSZ, 1235, "Repaired setup: {}%", progress);
+      previous_progress = progress;
+    }
     resizer_->updateParasitics();
     sta_->findRequireds();
     Slack end_slack = sta_->vertexSlack(end, max_);
