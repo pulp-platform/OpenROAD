@@ -529,10 +529,14 @@ void GlobalRouter::updateDirtyNets()
   initRoutingLayers();
   for (odb::dbNet* db_net : dirty_nets_) {
     Net* net = db_net_map_[db_net];
-    net->destroyPins();
-    makeItermPins(net, db_net, grid_->getGridArea());
-    makeBtermPins(net, db_net, grid_->getGridArea());
-    findPins(net);
+    if (net != nullptr) {
+      net->destroyPins();
+      makeItermPins(net, db_net, grid_->getGridArea());
+      makeBtermPins(net, db_net, grid_->getGridArea());
+      findPins(net);
+    } else {
+      logger_->info(GRT, 1234, "Net not found: {}", db_net->getName());
+    }
   }
 }
 
@@ -2336,9 +2340,17 @@ std::vector<Pin*> GlobalRouter::getAllPorts()
 {
   std::vector<Pin*> ports;
   for (auto [ignored, net] : db_net_map_) {
-    for (Pin& pin : net->getPins()) {
-      if (pin.isPort()) {
-        ports.push_back(&pin);
+    if (net != nullptr) {
+      for (Pin& pin : net->getPins()) {
+        if (pin.isPort()) {
+          ports.push_back(&pin);
+        }
+      }
+    } else {
+      if (ignored == nullptr) {
+        logger_->info(GRT, 4322, "Net and Key in db_net_map is nullptr!");
+      } else {
+        logger_->info(GRT, 4321, "Net {} in db_net_map is nullptr!", ignored->getName());
       }
     }
   }
@@ -3952,7 +3964,12 @@ void GlobalRouter::updateDirtyRoutes()
     std::vector<Net*> dirty_nets;
     dirty_nets.reserve(dirty_nets_.size());
     for (odb::dbNet* db_net : dirty_nets_) {
-      dirty_nets.push_back(db_net_map_[db_net]);
+      auto* net = db_net_map_[db_net];
+      if (net != nullptr) {
+        dirty_nets.push_back(net);
+      } else {
+        logger_->info(GRT, 1235, "Net not found during pushback: {}", db_net->getName());
+      }
     }
     initFastRouteIncr(dirty_nets);
 
