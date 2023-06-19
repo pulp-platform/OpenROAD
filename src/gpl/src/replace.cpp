@@ -215,9 +215,9 @@ void Replace::doIncrementalPlace()
   for (auto inst : block->getInsts()) {
     auto status = inst->getPlacementStatus();
     if (status == odb::dbPlacementStatus::PLACED) {
-      auto inst_ptr = pb_->dbToPb(inst);
+      auto inst_ptr = pbc_->dbToPb(inst);
       if (inst_ptr != nullptr) {
-        pb_->dbToPb(inst)->lock();
+        pbc_->dbToPb(inst)->lock();
         ++locked_cnt;
       } else {
         log_->info(GPL, 2345, "Failed to lock {}", inst->getName());
