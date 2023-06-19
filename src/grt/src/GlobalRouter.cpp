@@ -581,6 +581,7 @@ void GlobalRouter::updateDirtyNets(std::vector<Net*>& dirty_nets)
         // compare new positions with last positions & add on vector
         if (checkPinPositions(net, last_pos)) {
           dirty_nets.push_back(db_net_map_[db_net]);
+        }
     } else {
       logger_->info(GRT, 1234, "Net not found: {}", db_net->getName());
     }
@@ -3965,6 +3966,7 @@ void GlobalRouter::updateDirtyRoutes()
 
     if (dirty_nets.empty()) {
       return;
+    }
 
     initFastRouteIncr(dirty_nets);
 
