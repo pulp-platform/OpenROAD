@@ -312,8 +312,8 @@ class PlacerBaseCommon
  public:
   PlacerBaseCommon();
   // temp padLeft/Right before OpenDB supporting...
-  PlacerBase(odb::dbDatabase* db, dpl::Opendp* dp, PlacerBaseVars pbVars, utl::Logger* log);
-  ~PlacerBase();
+  PlacerBaseCommon(odb::dbDatabase* db, dpl::Opendp* dp, PlacerBaseVars pbVars, utl::Logger* log);
+  ~PlacerBaseCommon();
 
   const std::vector<Instance*>& placeInsts() const { return placeInsts_; }
   const std::vector<Instance*>& insts() const { return insts_; }
